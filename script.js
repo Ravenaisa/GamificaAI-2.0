@@ -2,7 +2,7 @@ let menu = document.getElementById("menu")
 let iconeBarras = document.getElementById("icone-barras")
 let iconeX = document.getElementById("icone-x")
 
-function abreFechaMenu() {    
+function abreFechaMenu() {
     // Menu fechado - tem a classe menu-fechado
     // Menu aberto - não tem a classe menu-fechado
 
@@ -10,7 +10,7 @@ function abreFechaMenu() {
     // menu.classList.toggle("menu-fechado")
 
     // Se o menu contem a classe menu-fechado
-    if ( menu.classList.contains("menu-fechado") ) {
+    if (menu.classList.contains("menu-fechado")) {
         // Abrir o menu - remover a classe menu-fechado
         menu.classList.remove("menu-fechado")
 
@@ -74,7 +74,7 @@ function mostrarProximoSlide() {
 
     if (slideAtual < 2) {
         // Somar 1 na variavel slideAtual
-        slideAtual++        
+        slideAtual++
     } else {
         // Voltar para o primeiro banner
         slideAtual = 0
@@ -103,7 +103,7 @@ function mostrarSlideAnterior() {
 function selecionarSlide(indiceSlide) {
     // Remove o slide atual
     banner.classList.remove(slides[slideAtual])
-    
+
     // Atualiza a variavel com o indice de slide selecionado
     slideAtual = indiceSlide
 
@@ -112,34 +112,91 @@ function selecionarSlide(indiceSlide) {
 }
 
 //carregamento dinamico dos cases
-let listaCases = [
-    
-    
-]
+let listaCases = []
 
-    function renderizarCases(){
-        //Encontrar o elemento para inserir os cards
-        let containerCards = document.querySelector(".container-cards")
+function renderizarCases() {
+    //Encontrar o elemento para inserir os cards
+    let containerCards = document.querySelector(".container-cards")
 
-        //variável para guardar o html dos cases montados
+    //variável para guardar o html dos cases montados
 
-        let template = ""
+    let template = ""
 
-        //Para cada case da listaCases
-         listaCases.forEach(cardCase => {
-           
-            //Montar o html do card, passando os atributos do cases
+    //Para cada case da listaCases
+    listaCases.forEach(cardCase => {
 
-            template += `<div class="card">
+        //Montar o html do card, passando os atributos do cases
+
+        template += `<div class="card">
                 <img src=${cardCase.image} alt="">
                 <p>${cardCase.descricao}</p>
                 <button>Ver mais</button>
              </div>`
 
-         })
+    })
+
+
+    //Inserir html dos cases montados no elemento container-cards
+    containerCards.innerHTML = template
+
+
+}
+
+function carregarCases() {
+    fetch("http://localhost:3000/cases")
+
+        .then((resposta) => resposta.json())
+        .then((dadosTratados) => {
+            console.log(dadosTratados)
+            listaCases = dadosTratados
+            renderizarCases()
+        })
+}
+
+    function solicitarOrcamento() {
+        //pegar os valores dos inputs
+        let valorNome = document.getElementById("campo-nome").value
+        let valorEmail = document.getElementById("campo-email").value
+        let valorDescricao = document.getElementById("campo-texto").value
+       
+       console.log(valorNome, valorEmail, valorDescricao);
+
+        //organizar valores em um objeto
+        let dadosForm = {
+            nome: valorNome,
+            email: valorEmail,
+            descricao: valorDescricao
+        }
+        console.log(dadosForm)
+
+        //enviar requisição para API
+        //metodo HTTP POST - create/criar -> cadastrar um novo registro 
+        fetch("http://localhost:3000/solicitacoes", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/jason"
+            },
+            body:JSON.stringify(dadosForm)
+        })
+
+        //CASO SUCESSO 
+        .then(resposta => {
+            console.log(resposta);
+      
+            //limpar os inpults
+            document.querySelector("#contato form").reset()
+
+            //mostrar um alert de sucesso 
+            alert("Solicitação enviada com sucesso !!!👍")
+      
+        })
         
-        //Inserir html dos cases montados no elemento container-cards
-        containerCards.innerHTML = template
-
-
-    }
+        // CASO ERRO
+        //mostrar alert com msg de erro    
+     
+        .catch(erro => {
+            console.log(erro);
+            alert("Erro na requisição 😢")
+         })
+ }
+       
